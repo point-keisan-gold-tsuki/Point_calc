@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#087443">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ポイント計算">
+  <title>ポイント計算</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#f3f6f2;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;color:#123c2e}
+    main{max-width:480px;margin:auto;min-height:100vh;padding:calc(28px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom))}
+    .app{background:#fff;border-radius:26px;padding:25px 20px;box-shadow:0 8px 30px #0002}
+    .brand{text-align:center;font-weight:900;letter-spacing:.12em;color:#087443;font-size:13px}
+    h1{text-align:center;margin:6px 0 4px;font-size:27px}
+    .sub{text-align:center;color:#66736d;font-size:14px;margin-bottom:24px}
+    label{font-weight:800;font-size:15px;display:block;margin-bottom:8px}
+    input{width:100%;height:66px;border:2px solid #d8e0db;border-radius:15px;font-size:30px;font-weight:800;text-align:right;padding:0 15px;color:#123c2e;outline:0;-webkit-appearance:none;appearance:none}
+    input:focus{border-color:#087443}
+    button{width:100%;height:55px;border:0;border-radius:15px;background:#087443;color:#fff;font-size:18px;font-weight:900;margin-top:12px;-webkit-appearance:none;appearance:none;cursor:pointer}
+    .results{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+    .box{border-radius:18px;padding:17px 10px;text-align:center;background:#eef7f1}
+    .box.special{background:#fff5d9}
+    .box.full{grid-column:1 / -1}
+    .title{font-size:14px;font-weight:800}
+    .points{font-size:35px;font-weight:900;margin-top:6px;line-height:1.1}
+    .desc{font-size:12px;color:#68736e;margin-top:6px}
+    .clear{background:#e8eeea;color:#315044;margin-top:12px}
+    .note{text-align:center;font-size:12px;color:#7a8580;margin-top:15px}
+    .gold-note{
+      margin-top:14px;
+      padding:12px 14px;
+      background:linear-gradient(135deg,#f8f1d0,#fff8e1);
+      border:1px solid #e8d48b;
+      border-radius:14px;
+      text-align:center;
+      font-size:13px;
+      font-weight:700;
+      color:#8a6d1d;
+      line-height:1.4;
+      width:100%;
+      cursor:pointer;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+    .gold-note.active{
+      background:linear-gradient(135deg,#e8c95b,#fff0a8);
+      border-color:#c5a12b;
+      color:#6f5410;
+      box-shadow:0 3px 10px #b9962a44;
+    }
+    .gold-note:active{transform:scale(.99)}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="app">
+      <div class="brand">CAINZ</div>
+      <h1>ポイント計算</h1>
+      <div class="sub">税込金額 × 還元率で計算</div>
+
+      <label for="amount">税込金額</label>
+      <input id="amount" inputmode="numeric" type="text" placeholder="金額を入力" autocomplete="off">
+
+      <button type="button" onclick="calc()">計算する</button>
+
+      <div class="results">
+        <div class="box">
+          <div class="title">通常</div>
+          <div class="points" id="normal">0 pt</div>
+          <div class="desc">0.5%</div>
+        </div>
+        <div class="box special">
+          <div class="title">5倍</div>
+          <div class="points" id="five">0 pt</div>
+          <div class="desc">2.5%</div>
+        </div>
+        <div class="box special full">
+          <div class="title">10倍</div>
+          <div class="points" id="ten">0 pt</div>
+          <div class="desc">5.0%</div>
+        </div>
+      </div>
+
+      <button type="button" class="gold-note" id="goldToggle" onclick="toggleGold()">
+         ゴールド会員の方は<br>さらに <strong>+1倍</strong>
+       </button>
+
+      <button type="button" class="clear" onclick="clearAll()">クリア</button>
+      <div class="note">金額を入力 →「計算する」だけでOK</div>
+    </div>
+  </main>
+
+  <script>
+    const a = document.getElementById('amount');
+
+    let goldActive = false;
+
+    function calc() {
+       const n = parseInt(a.value.replace(/[^0-9]/g, ''), 10) || 0;
+
+       // ゴールド会員ON時は+1倍分（通常還元相当）を加算
+       const goldRate = goldActive ? 0.004545 : 0;
+       const normal = Math.floor(n * (0.004545 + goldRate));
+       const five   = Math.floor(n * (0.02493 + goldRate));
+       const ten    = Math.floor(n * (0.049593 + goldRate));
+
+       document.getElementById('normal').textContent = normal.toLocaleString() + ' pt';
+       document.getElementById('five').textContent   = five.toLocaleString() + ' pt';
+       document.getElementById('ten').textContent    = ten.toLocaleString() + ' pt';
+    }
+
+    function toggleGold() {
+       goldActive = !goldActive;
+       document.getElementById('goldToggle').classList.toggle('active', goldActive);
+       calc();
+    }
+
+    function clearAll() {
+       a.value = '';
+       goldActive = false;
+       document.getElementById('goldToggle').classList.remove('active');
+       calc();
+       a.focus();
+    }
+
+    a.addEventListener('input', () => {
+      a.value = a.value.replace(/[^0-9]/g, '');
+    });
+
+    a.addEventListener('keydown', e => {
+      if (e.key === 'Enter') calc();
+    });
+  </script>
+</body>
+</html>
