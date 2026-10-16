@@ -2,24 +2,76 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#087443">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ポイント計算">
+  <meta name="format-detection" content="telephone=no">
   <title>ポイント計算</title>
   <style>
-    *{box-sizing:border-box}
-    body{margin:0;background:#f3f6f2;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;color:#123c2e}
-    main{max-width:480px;margin:auto;min-height:100vh;padding:calc(28px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom))}
-    .app{background:#fff;border-radius:26px;padding:25px 20px;box-shadow:0 8px 30px #0002}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{height:100%;-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      background:#f3f6f2;
+      font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Hiragino Sans",sans-serif;
+      color:#123c2e;
+      min-height:100%;
+      min-height:100dvh;
+      overscroll-behavior:none;
+      -webkit-overflow-scrolling:touch;
+    }
+    body.modal-open{overflow:hidden;position:fixed;width:100%;height:100%}
+    main{
+      max-width:480px;
+      margin:auto;
+      min-height:100vh;
+      min-height:100dvh;
+      padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(28px + env(safe-area-inset-bottom,0px));
+    }
+    .app{
+      background:#fff;
+      border-radius:26px;
+      padding:25px 20px;
+      box-shadow:0 8px 30px #0002;
+    }
     .brand{text-align:center;font-weight:900;letter-spacing:.12em;color:#087443;font-size:13px}
     h1{text-align:center;margin:6px 0 4px;font-size:27px}
     .sub{text-align:center;color:#66736d;font-size:14px;margin-bottom:24px}
     label{font-weight:800;font-size:15px;display:block;margin-bottom:8px}
-    input{width:100%;height:66px;border:2px solid #d8e0db;border-radius:15px;font-size:30px;font-weight:800;text-align:right;padding:0 15px;color:#123c2e;outline:0;-webkit-appearance:none;appearance:none}
+    input{
+      width:100%;
+      height:66px;
+      border:2px solid #d8e0db;
+      border-radius:15px;
+      font-size:30px;
+      font-weight:800;
+      text-align:right;
+      padding:0 15px;
+      color:#123c2e;
+      outline:0;
+      -webkit-appearance:none;
+      appearance:none;
+      touch-action:manipulation;
+    }
     input:focus{border-color:#087443}
-    button{width:100%;height:55px;border:0;border-radius:15px;background:#087443;color:#fff;font-size:18px;font-weight:900;margin-top:12px;-webkit-appearance:none;appearance:none;cursor:pointer}
+    button{
+      width:100%;
+      height:55px;
+      border:0;
+      border-radius:15px;
+      background:#087443;
+      color:#fff;
+      font-size:18px;
+      font-weight:900;
+      margin-top:12px;
+      -webkit-appearance:none;
+      appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    button:active{opacity:.92}
     .results{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
     .box{border-radius:18px;padding:17px 10px;text-align:center;background:#eef7f1}
     .box.special{background:#fff5d9}
@@ -44,6 +96,7 @@
       cursor:pointer;
       -webkit-appearance:none;
       appearance:none;
+      touch-action:manipulation;
     }
     .gold-note.active{
       background:linear-gradient(135deg,#e8c95b,#fff0a8);
@@ -52,6 +105,57 @@
       box-shadow:0 3px 10px #b9962a44;
     }
     .gold-note:active{transform:scale(.99)}
+    .modal-backdrop{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(16,37,29,.82);
+      z-index:99999;
+      padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px));
+      align-items:center;
+      justify-content:center;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .modal-backdrop.open{display:flex}
+    .modal{
+      width:100%;
+      max-width:440px;
+      max-height:min(90vh,90dvh);
+      overflow-y:auto;
+      background:#fff;
+      border-radius:22px;
+      padding:20px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .modal h2{font-size:21px;margin:0 0 8px}
+    .modal p{font-size:13px;color:#66736d;margin:0 0 14px}
+    .modal label{margin-top:12px}
+    .modal input,.modal select{
+      width:100%;
+      height:56px;
+      border:2px solid #d8e0db;
+      border-radius:14px;
+      font-size:22px;
+      font-weight:800;
+      padding:0 12px;
+      color:#123c2e;
+      background:#fff;
+      -webkit-appearance:none;
+      appearance:none;
+      touch-action:manipulation;
+    }
+    .modal select{
+      font-size:18px;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23123c2e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 14px center;
+      padding-right:36px;
+    }
+    .modal-result{margin-top:14px;padding:14px;border-radius:14px;background:#eef7f1;text-align:center}
+    .modal-result.first{background:#fff5d9}
+    .modal-result strong{display:block;font-size:29px;margin-top:5px}
+    .modal-close{background:#e8eeea;color:#315044;margin-top:12px}
   </style>
 </head>
 <body>
@@ -62,9 +166,10 @@
       <div class="sub">税込金額 × 還元率で計算</div>
 
       <label for="amount">税込金額</label>
-      <input id="amount" inputmode="numeric" type="text" placeholder="金額を入力" autocomplete="off">
+      <input id="amount" inputmode="numeric" pattern="[0-9]*" type="text" placeholder="金額を入力" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 
       <button type="button" onclick="calc()">計算する</button>
+      <button type="button" style="background:#1769aa" onclick="openInstallment()">分割払いシミュレーター</button>
 
       <div class="results">
         <div class="box">
@@ -73,18 +178,18 @@
           <div class="desc">0.5%</div>
         </div>
         <div class="box special">
-          <div class="title">5倍</div>
+          <div class="title" id="fiveTitle">5倍</div>
           <div class="points" id="five">0 pt</div>
-          <div class="desc">2.5%</div>
+          <div class="desc" id="fiveRate">2.5%</div>
         </div>
         <div class="box special full">
-          <div class="title">10倍</div>
+          <div class="title" id="tenTitle">10倍</div>
           <div class="points" id="ten">0 pt</div>
-          <div class="desc">5.0%</div>
+          <div class="desc" id="tenRate">5.0%</div>
         </div>
       </div>
 
-      <button type="button" class="gold-note" id="goldToggle" onclick="toggleGold()">
+      <button type="button" class="gold-note" id="goldToggle" onclick="toggleGold()" aria-pressed="false">
          ゴールド会員の方は<br>さらに <strong>+1倍</strong>
        </button>
 
@@ -93,46 +198,101 @@
     </div>
   </main>
 
+  <div id="installmentModal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2>分割払いシミュレーター</h2>
+      <p>回数を選ぶと初回と2回目以降の金額を計算します。手数料は含みません。</p>
+      <label for="installmentAmount">支払う金額（税込・円）</label>
+      <input id="installmentAmount" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="金額を入力" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="this.value=this.value.replace(/[^0-9]/g,'');calcInstallment()">
+      <label for="installmentCount">分割回数</label>
+      <select id="installmentCount" onchange="calcInstallment()">
+        <option value="2">2回払い</option><option value="3" selected>3回払い</option>
+        <option value="6">6回払い</option><option value="10">10回払い</option>
+        <option value="12">12回払い</option><option value="18">18回払い</option>
+        <option value="24">24回払い</option><option value="30">30回払い</option><option value="36">36回払い</option>
+      </select>
+      <div class="modal-result first">1回目のお支払い<strong id="installmentFirst">0円</strong><small>端数は初回に加算</small></div>
+      <div class="modal-result">2回目以降（毎月）<strong id="installmentMonthly">0円</strong><small id="installmentMonthlyNote">残りのお支払い</small></div>
+      <p id="installmentTotal" style="text-align:center;margin-top:12px">合計 0円</p>
+      <button type="button" class="modal-close" onclick="closeInstallment()">閉じる</button>
+    </div>
+  </div>
+
   <script>
-    const a = document.getElementById('amount');
+    var goldActive = false;
+    var scrollY = 0;
+    function byId(id){ return document.getElementById(id); }
+    function numericValue(el){ return parseInt((el.value || '').replace(/[^0-9]/g, ''), 10) || 0; }
 
-    let goldActive = false;
-
-    function calc() {
-       const n = parseInt(a.value.replace(/[^0-9]/g, ''), 10) || 0;
-
-       // ゴールド会員ON時は+1倍分（通常還元相当）を加算
-       const goldRate = goldActive ? 0.004545 : 0;
-       const normal = Math.floor(n * (0.004545 + goldRate));
-       const five   = Math.floor(n * (0.02493 + goldRate));
-       const ten    = Math.floor(n * (0.049593 + goldRate));
-
-       document.getElementById('normal').textContent = normal.toLocaleString() + ' pt';
-       document.getElementById('five').textContent   = five.toLocaleString() + ' pt';
-       document.getElementById('ten').textContent    = ten.toLocaleString() + ' pt';
+    function calc(){
+      var amount = byId('amount');
+      var n = numericValue(amount);
+      var normal = Math.floor(n / 220) * (goldActive ? 2 : 1);
+      var goldRate = goldActive ? 0.004545 : 0;
+      var five = Math.floor(n * (0.02493 + goldRate));
+      var ten = Math.floor(n * (0.049593 + goldRate));
+      byId('normal').textContent = normal.toLocaleString('ja-JP') + ' pt';
+      byId('five').textContent = five.toLocaleString('ja-JP') + ' pt';
+      byId('ten').textContent = ten.toLocaleString('ja-JP') + ' pt';
+      byId('fiveTitle').textContent = goldActive ? '6倍' : '5倍';
+      byId('fiveRate').textContent = goldActive ? '3.0%' : '2.5%';
+      byId('tenTitle').textContent = goldActive ? '11倍' : '10倍';
+      byId('tenRate').textContent = goldActive ? '5.5%' : '5.0%';
     }
 
-    function toggleGold() {
-       goldActive = !goldActive;
-       document.getElementById('goldToggle').classList.toggle('active', goldActive);
-       calc();
+    function toggleGold(){
+      goldActive = !goldActive;
+      var b = byId('goldToggle');
+      b.classList.toggle('active', goldActive);
+      b.setAttribute('aria-pressed', String(goldActive));
+      calc();
     }
 
-    function clearAll() {
-       a.value = '';
-       goldActive = false;
-       document.getElementById('goldToggle').classList.remove('active');
-       calc();
-       a.focus();
+    function clearAll(){
+      byId('amount').value = '';
+      goldActive = false;
+      byId('goldToggle').classList.remove('active');
+      byId('goldToggle').setAttribute('aria-pressed','false');
+      calc();
     }
 
-    a.addEventListener('input', () => {
-      a.value = a.value.replace(/[^0-9]/g, '');
+    function calcInstallment(){
+      var amountEl = byId('installmentAmount');
+      var countEl = byId('installmentCount');
+      if(!amountEl || !countEl) return;
+      var total = numericValue(amountEl);
+      var count = parseInt(countEl.value,10) || 3;
+      var monthly = Math.floor(total / count);
+      var first = total - monthly * (count - 1);
+      byId('installmentFirst').textContent = first.toLocaleString('ja-JP') + '円';
+      byId('installmentMonthly').textContent = monthly.toLocaleString('ja-JP') + '円';
+      byId('installmentMonthlyNote').textContent = (count - 1) + '回分（初回を除く）';
+      byId('installmentTotal').textContent = '合計 ' + (first + monthly * (count - 1)).toLocaleString('ja-JP') + '円（手数料なし）';
+    }
+
+    function openInstallment(){
+      byId('installmentAmount').value = (byId('amount').value || '').replace(/[^0-9]/g,'');
+      calcInstallment();
+      scrollY = window.scrollY || window.pageYOffset;
+      document.body.classList.add('modal-open');
+      document.body.style.top = '-' + scrollY + 'px';
+      byId('installmentModal').classList.add('open');
+    }
+    function closeInstallment(){
+      byId('installmentModal').classList.remove('open');
+      document.body.classList.remove('modal-open');
+      document.body.style.top = '';
+      window.scrollTo(0, scrollY);
+    }
+
+    byId('amount').addEventListener('input', function(){
+      this.value = this.value.replace(/[^0-9]/g,'');
+      calc();
     });
-
-    a.addEventListener('keydown', e => {
-      if (e.key === 'Enter') calc();
-    });
+    byId('amount').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); calc(); } });
+    byId('installmentModal').addEventListener('click', function(e){ if(e.target === this) closeInstallment(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeInstallment(); });
+    calc();
   </script>
 </body>
 </html>
