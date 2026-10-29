@@ -18,6 +18,7 @@
     .app{background:#fff;border-radius:26px;padding:25px 20px;box-shadow:0 8px 30px #0002}
     .brand{text-align:center;font-weight:900;letter-spacing:.12em;color:#087443;font-size:13px}
     h1{text-align:center;margin:6px 0 4px;font-size:27px}
+    .disclaimer{text-align:center;color:#c0392b;font-size:12px;font-weight:700;margin:0 0 10px;line-height:1.4}
     .sub{text-align:center;color:#66736d;font-size:14px;margin-bottom:24px}
     label{font-weight:800;font-size:15px;display:block;margin-bottom:8px}
     input{width:100%;height:66px;border:2px solid #d8e0db;border-radius:15px;font-size:30px;font-weight:800;text-align:right;padding:0 15px;color:#123c2e;outline:0;-webkit-appearance:none;appearance:none;touch-action:manipulation}
@@ -28,14 +29,17 @@
     .box{border-radius:18px;padding:17px 10px;text-align:center;background:#eef7f1}
     .box.special{background:#fff5d9}
     .box.full{grid-column:1 / -1}
-    .title{font-size:14px;font-weight:800}
+    .title{font-size:18px;font-weight:800}
     .points{font-size:35px;font-weight:900;margin-top:6px;line-height:1.1}
     .desc{font-size:12px;color:#68736e;margin-top:6px}
+    .pets-results .desc{display:none}
     .clear{background:#e8eeea;color:#315044;margin-top:12px}
     .note{text-align:center;font-size:12px;color:#7a8580;margin-top:15px}
-    .gold-note{margin-top:14px;padding:12px 14px;background:linear-gradient(135deg,#f8f1d0,#fff8e1);border:1px solid #e8d48b;border-radius:14px;text-align:center;font-size:13px;font-weight:700;color:#8a6d1d;line-height:1.4;width:100%;cursor:pointer;-webkit-appearance:none;appearance:none;touch-action:manipulation}
+    .gold-note{margin-top:14px;padding:12px 14px;background:linear-gradient(135deg,#f8f1d0,#fff8e1);border:1px solid #e8d48b;border-radius:14px;text-align:center;font-size:13px;font-weight:700;color:#8a6d1d;line-height:1.4;width:100%;height:auto;cursor:pointer;-webkit-appearance:none;appearance:none;touch-action:manipulation}
     .gold-note.active{background:linear-gradient(135deg,#e8c95b,#fff0a8);border-color:#c5a12b;color:#6f5410;box-shadow:0 3px 10px #b9962a44}
     .gold-note:active{transform:scale(.99)}
+    .gold-caution{display:none;margin-top:10px;padding:10px 12px;background:#fff5d9;border:1px solid #e8d48b;border-radius:12px;text-align:center;font-size:12px;font-weight:700;color:#8a6d1d}
+    .gold-caution.show{display:block}
     .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(16,37,29,.82);z-index:99999;padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px));align-items:center;justify-content:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
     .modal-backdrop.open{display:flex}
     .modal{width:100%;max-width:440px;max-height:min(90vh,90dvh);overflow-y:auto;background:#fff;border-radius:22px;padding:20px;-webkit-overflow-scrolling:touch}
@@ -48,46 +52,107 @@
     .modal-result.first{background:#fff5d9}
     .modal-result strong{display:block;font-size:29px;margin-top:5px}
     .modal-close{background:#e8eeea;color:#315044;margin-top:12px}
+
+    .page-tabs{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;margin:0 0 14px}
+    .page-tab{height:auto;min-height:52px;margin:0;padding:10px 7px;font-size:14px;line-height:1.25;background:#e3eae5;color:#315044;border-radius:14px}
+    .page-tab.active{background:#087443;color:#fff}
+    .page-tab small{display:block;font-size:10px;font-weight:700;margin-top:3px}
+    .page-panel{display:none}.page-panel.active{display:block}
+    .pets-brand{color:#1769aa}.pets-button{background:#1769aa}
+    .pets-results{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+    .pets-results .box{padding:16px 8px;min-height:112px}
+    .pets-results .points{font-size:32px}
+    .pay-label{display:inline-block;margin-top:3px;font-size:11px;font-weight:700;color:#8a6d1d}
+    .pets-note{text-align:center;font-size:12px;color:#7a8580;margin-top:15px;line-height:1.5}
   </style>
 </head>
 <body>
   <main>
-    <div class="app">
-      <div class="brand">CAINZ</div>
-      <h1>ポイント計算</h1>
-      <div class="sub">税込金額 × 還元率で計算（早見表準拠）</div>
-
-      <label for="amount">税込金額</label>
-      <input id="amount" inputmode="numeric" pattern="[0-9]*" type="text" placeholder="金額を入力" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-
-      <button type="button" onclick="calc()">計算する</button>
-      <button type="button" style="background:#1769aa" onclick="openInstallment()">分割払いシミュレーター</button>
-
-      <div class="results">
-        <div class="box">
-          <div class="title" id="normalTitle">通常</div>
-          <div class="points" id="normal">0 pt</div>
-          <div class="desc" id="normalRate">0.5%</div>
-        </div>
-        <div class="box special">
-          <div class="title" id="fiveTitle">5倍</div>
-          <div class="points" id="five">0 pt</div>
-          <div class="desc" id="fiveRate">2.5%</div>
-        </div>
-        <div class="box special full">
-          <div class="title" id="tenTitle">10倍</div>
-          <div class="points" id="ten">0 pt</div>
-          <div class="desc" id="tenRate">5.0%</div>
-        </div>
-      </div>
-
-      <button type="button" class="gold-note" id="goldToggle" onclick="toggleGold()" aria-pressed="false">
-         ゴールド会員の方は<br>さらに <strong>+1倍</strong>
-       </button>
-
-      <button type="button" class="clear" onclick="clearAll()">クリア</button>
-      <div class="note">金額を入力 →「計算する」だけでOK</div>
+    <div class="page-tabs" role="tablist" aria-label="ポイント計算の種類">
+      <button type="button" class="page-tab active" id="cainzTab" onclick="showPage('cainz')" role="tab" aria-selected="true">CAINZ Pay</button>
+      <button type="button" class="page-tab" id="petsTab" onclick="showPage('pets')" role="tab" aria-selected="false">ペッツワンメンバーズ<small>特定日限定</small></button>
     </div>
+
+    <section id="cainzPage" class="page-panel active">
+      <div class="app">
+        <div class="brand">CAINZ Pay</div>
+        <h1>ポイント計算</h1>
+        <div class="disclaimer">※ポイント数は目安です。多少前後する可能性があります。</div>
+        <div class="sub">税込金額 × 還元率で計算（早見表準拠）</div>
+
+        <label for="amount">税込金額</label>
+        <input id="amount" inputmode="numeric" pattern="[0-9]*" type="text" placeholder="金額を入力" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+        <button type="button" onclick="calc()">計算する</button>
+        <button type="button" style="background:#1769aa" onclick="openInstallment()">分割払いシミュレーター</button>
+
+        <div class="results">
+          <div class="box">
+            <div class="title" id="normalTitle">通常</div>
+            <div class="points" id="normal">0 pt</div>
+            <div class="desc" id="normalRate">0.5%</div>
+          </div>
+          <div class="box special">
+            <div class="title" id="fiveTitle">5倍</div>
+            <div class="points" id="five">0 pt</div>
+            <div class="desc" id="fiveRate">2.5%</div>
+          </div>
+          <div class="box special full">
+            <div class="title" id="tenTitle">10倍</div>
+            <div class="points" id="ten">0 pt</div>
+            <div class="desc" id="tenRate">5.0%</div>
+          </div>
+        </div>
+
+        <button type="button" class="gold-note" id="goldToggle" onclick="toggleGold()" aria-pressed="false">
+          ゴールド会員の方は<br>さらに <strong>+1倍</strong>
+        </button>
+        <div class="gold-caution" id="goldCaution">※一部対象外の商品があります。</div>
+
+        <button type="button" class="clear" onclick="clearAll()">クリア</button>
+        <div class="note">金額を入力 →「計算する」だけでOK</div>
+      </div>
+    </section>
+
+    <section id="petsPage" class="page-panel">
+      <div class="app">
+        <div class="brand pets-brand">ペッツワンメンバーズ</div>
+        <h1>ポイント計算</h1>
+        <div class="disclaimer">※ポイント数は目安です。多少前後する可能性があります。</div>
+        <div class="sub">特定日限定ポイントアップの早見表</div>
+
+        <label for="petsAmount">税込金額</label>
+        <input id="petsAmount" inputmode="numeric" pattern="[0-9]*" type="text" placeholder="金額を入力" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+        <button type="button" class="pets-button" onclick="calcPets()">計算する</button>
+
+        <div class="pets-results">
+          <div class="box">
+            <div class="title">通常</div>
+            <div class="points" id="petsNormal">0 pt</div>
+            <div class="desc">0.5%</div>
+          </div>
+          <div class="box special">
+            <div class="title">10倍</div>
+            <div class="points" id="pets10">0 pt</div>
+            <div class="desc">5.0%</div>
+          </div>
+          <div class="box special full">
+            <div class="title">14倍<br><span class="pay-label">CAINZ Payで支払い</span></div>
+            <div class="points" id="pets14">0 pt</div>
+            <div class="desc">7.0%</div>
+          </div>
+          <div class="box special full">
+            <div class="title">19倍<br><span class="pay-label">CAINZ Payで支払い・11月8日限定</span></div>
+            <div class="points" id="pets19">0 pt</div>
+            <div class="desc">9.5%</div>
+          </div>
+        </div>
+
+        <button type="button" class="clear" onclick="clearPets()">クリア</button>
+        <div class="pets-note">ペッツワンメンバーズの特定日限定<br>倍率・還元率は運用条件に合わせて確認してください。</div>
+      </div>
+    </section>
   </main>
 
   <div id="installmentModal" class="modal-backdrop" role="dialog" aria-modal="true">
@@ -98,10 +163,15 @@
       <input id="installmentAmount" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="金額を入力" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="this.value=this.value.replace(/[^0-9]/g,'');calcInstallment()">
       <label for="installmentCount">分割回数</label>
       <select id="installmentCount" onchange="calcInstallment()">
-        <option value="2">2回払い</option><option value="3" selected>3回払い</option>
-        <option value="6">6回払い</option><option value="10">10回払い</option>
-        <option value="12">12回払い</option><option value="18">18回払い</option>
-        <option value="24">24回払い</option><option value="30">30回払い</option><option value="36">36回払い</option>
+        <option value="2">2回払い</option>
+        <option value="3" selected>3回払い</option>
+        <option value="6">6回払い</option>
+        <option value="10">10回払い</option>
+        <option value="12">12回払い</option>
+        <option value="18">18回払い</option>
+        <option value="24">24回払い</option>
+        <option value="30">30回払い</option>
+        <option value="36">36回払い</option>
       </select>
       <div class="modal-result first">1回目のお支払い<strong id="installmentFirst">0円</strong><small>端数は初回に加算</small></div>
       <div class="modal-result">2回目以降（毎月）<strong id="installmentMonthly">0円</strong><small id="installmentMonthlyNote">残りのお支払い</small></div>
@@ -116,12 +186,40 @@
     function byId(id){ return document.getElementById(id); }
     function numericValue(el){ return parseInt((el.value || '').replace(/[^0-9]/g, ''), 10) || 0; }
 
-    // 早見表（カインズペイ早見表 260319）準拠
     // 通常ポイント: 税抜200円につき1pt（消費税10%）
-    // CAINZ Pay等: クレカ1.2% + CAINZ Pay 0.8% + キャンペーン2.5%分を整数演算で算出（早見表と全行一致）
+    function basePoint(n){ return Math.floor(Math.floor(n * 10 / 11) / 200); }
+
+    function showPage(page){
+      var cainz = page === 'cainz';
+      byId('cainzPage').classList.toggle('active', cainz);
+      byId('petsPage').classList.toggle('active', !cainz);
+      byId('cainzTab').classList.toggle('active', cainz);
+      byId('petsTab').classList.toggle('active', !cainz);
+      byId('cainzTab').setAttribute('aria-selected', String(cainz));
+      byId('petsTab').setAttribute('aria-selected', String(!cainz));
+      if(!cainz) calcPets();
+    }
+
+        function calcPets(){
+      var n = numericValue(byId('petsAmount'));
+      var base = basePoint(n);
+      var plan = Math.floor(Math.floor(n * 10 / 11) * 45 / 1000);  // 企画ポイント10倍分: 税抜×4.5%
+      var r5  = base + Math.floor(n * 20048 / 1000000);            // レギュラー5倍
+      var r10 = base + Math.floor(n * 45048 / 1000000);            // レギュラー10倍
+      var p10 = r10;                // 10倍
+      var p14 = r5 + plan;          // 14倍 = レギュラー5倍 + 企画10倍分
+      var p19 = r10 + plan;         // 19倍 = レギュラー10倍 + 企画10倍分
+      byId('petsNormal').textContent = base.toLocaleString('ja-JP') + ' pt';
+      byId('pets10').textContent = p10.toLocaleString('ja-JP') + ' pt';
+      byId('pets14').textContent = p14.toLocaleString('ja-JP') + ' pt';
+      byId('pets19').textContent = p19.toLocaleString('ja-JP') + ' pt';
+    }
+    function clearPets(){ byId('petsAmount').value = ''; calcPets(); }
+
+    // CAINZ Pay（早見表260319 全90値一致確認済み）
     function calc(){
       var n = numericValue(byId('amount'));
-      var base = Math.floor(Math.floor(n * 10 / 11) / 200);        // 通常 0.5%
+      var base = basePoint(n);
       var mult = goldActive ? 2 : 1;                                // ゴールドは通常ポイント2倍(1.0%)
       var normal = base * mult;
       var five = normal + Math.floor(n * 20048 / 1000000);          // 2.5% / ゴールド3.0%
@@ -141,6 +239,7 @@
       var b = byId('goldToggle');
       b.classList.toggle('active', goldActive);
       b.setAttribute('aria-pressed', String(goldActive));
+      byId('goldCaution').classList.toggle('show', goldActive);
       calc();
     }
 
@@ -149,6 +248,7 @@
       goldActive = false;
       byId('goldToggle').classList.remove('active');
       byId('goldToggle').setAttribute('aria-pressed','false');
+      byId('goldCaution').classList.remove('show');
       calc();
     }
 
@@ -181,6 +281,13 @@
       window.scrollTo(0, scrollY);
     }
 
+    byId('petsAmount').addEventListener('input', function(){
+      this.value = this.value.replace(/[^0-9]/g,'');
+      calcPets();
+    });
+    byId('petsAmount').addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){ e.preventDefault(); calcPets(); }
+    });
     byId('amount').addEventListener('input', function(){
       this.value = this.value.replace(/[^0-9]/g,'');
       calc();
