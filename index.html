@@ -64,6 +64,22 @@
     .pets-results .points{font-size:32px}
     .pay-label{display:inline-block;margin-top:3px;font-size:11px;font-weight:700;color:#8a6d1d}
     .pets-note{text-align:center;font-size:12px;color:#7a8580;margin-top:15px;line-height:1.5}
+      .pets-results .box.big{padding:30px 10px;min-height:190px}
+    .pets-results .box.big .title{font-size:26px}
+    .pets-results .box.big .pay-label{font-size:15px}
+    .pets-results .box.big .points{font-size:54px;margin-top:12px}
+    .pets-results .box.big .desc{display:block;font-size:16px}
+      @keyframes heroGlow{0%,100%{box-shadow:0 0 0 0 #e8a31a66,0 4px 14px #e8a31a44}50%{box-shadow:0 0 0 7px #e8a31a00,0 6px 22px #e8a31a99}}
+    @keyframes heroShine{0%{left:-60%}60%,100%{left:130%}}
+    @keyframes heroPop{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+    .box.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffe27a,#ffb627);border:3px solid #e8a31a;animation:heroGlow 2s ease-in-out infinite}
+    .box.hero::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,#fff9,transparent);transform:skewX(-20deg);animation:heroShine 3s ease-in-out infinite;pointer-events:none}
+    .box.hero .title{color:#7a1f00;font-size:22px}
+    .box.hero .points{color:#d62300;font-size:50px;text-shadow:0 2px 0 #fff8;animation:heroPop 2s ease-in-out infinite}
+    .box.hero .desc{color:#7a1f00;font-weight:800}
+    .box.hero .pay-label{color:#7a1f00}
+    .pets-results .box.big.hero .points{font-size:62px}
+    .pets-results .box.big.hero .title{font-size:28px}
   </style>
 </head>
 <body>
@@ -97,7 +113,7 @@
             <div class="points" id="five">0 pt</div>
             <div class="desc" id="fiveRate">2.5%</div>
           </div>
-          <div class="box special full">
+          <div class="box special full hero">
             <div class="title" id="tenTitle">10倍</div>
             <div class="points" id="ten">0 pt</div>
             <div class="desc" id="tenRate">5.0%</div>
@@ -137,15 +153,10 @@
             <div class="points" id="pets10">0 pt</div>
             <div class="desc">5.0%</div>
           </div>
-          <div class="box special full">
+          <div class="box special full big hero">
             <div class="title">14倍<br><span class="pay-label">CAINZ Payで支払い</span></div>
             <div class="points" id="pets14">0 pt</div>
-            <div class="desc">7.0%</div>
-          </div>
-          <div class="box special full">
-            <div class="title">19倍<br><span class="pay-label">CAINZ Payで支払い・11月8日限定</span></div>
-            <div class="points" id="pets19">0 pt</div>
-            <div class="desc">9.5%</div>
+            
           </div>
         </div>
 
@@ -208,11 +219,9 @@
       var r10 = base + Math.floor(n * 45048 / 1000000);            // レギュラー10倍
       var p10 = r10;                // 10倍
       var p14 = r5 + plan;          // 14倍 = レギュラー5倍 + 企画10倍分
-      var p19 = r10 + plan;         // 19倍 = レギュラー10倍 + 企画10倍分
       byId('petsNormal').textContent = base.toLocaleString('ja-JP') + ' pt';
       byId('pets10').textContent = p10.toLocaleString('ja-JP') + ' pt';
       byId('pets14').textContent = p14.toLocaleString('ja-JP') + ' pt';
-      byId('pets19').textContent = p19.toLocaleString('ja-JP') + ' pt';
     }
     function clearPets(){ byId('petsAmount').value = ''; calcPets(); }
 
